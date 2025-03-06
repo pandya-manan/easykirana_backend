@@ -12,8 +12,10 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.*;
 
+import com.easykirana.ecommerce.entity.Country;
 import com.easykirana.ecommerce.entity.Product;
 import com.easykirana.ecommerce.entity.ProductCategory;
+import com.easykirana.ecommerce.entity.State;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
@@ -45,6 +47,17 @@ public class MyDataRestConfig implements RepositoryRestConfigurer{
 		.forDomainType(ProductCategory.class)
 		.withItemExposure((metdata,httpMethods)->httpMethods.disable(theUnsupportedActions))
 		.withCollectionExposure((metdata,httpMethods)->httpMethods.disable(theUnsupportedActions));
+		
+		config.getExposureConfiguration()
+		.forDomainType(Country.class)
+		.withItemExposure((metdata,httpMethods)->httpMethods.disable(theUnsupportedActions))
+		.withCollectionExposure((metdata,httpMethods)->httpMethods.disable(theUnsupportedActions));
+		
+		config.getExposureConfiguration()
+		.forDomainType(State.class)
+		.withItemExposure((metdata,httpMethods)->httpMethods.disable(theUnsupportedActions))
+		.withCollectionExposure((metdata,httpMethods)->httpMethods.disable(theUnsupportedActions));
+		
 		exposeIds(config);
 		
 		
