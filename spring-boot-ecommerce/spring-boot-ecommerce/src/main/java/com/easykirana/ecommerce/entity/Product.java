@@ -6,6 +6,8 @@ import java.util.Date;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,7 @@ public class Product {
 	
 	@ManyToOne
 	@JoinColumn(name="category_id",nullable=false)
+	@JsonBackReference
 	private ProductCategory category;
 	
 	@Column(name="sku")

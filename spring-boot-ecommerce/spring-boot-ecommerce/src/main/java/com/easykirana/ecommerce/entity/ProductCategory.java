@@ -2,6 +2,8 @@ package com.easykirana.ecommerce.entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,6 +30,7 @@ public class ProductCategory {
 	private String categoryName;
 	
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="category")
+	@JsonManagedReference
 	private Set<Product> products;
 	
 	
