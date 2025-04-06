@@ -2,7 +2,10 @@ package com.easykirana.ecommerce.entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +20,10 @@ import lombok.Setter;
 
 @Entity
 @Table(name="product_category")
+//@JsonIdentityInfo(
+//	    generator = ObjectIdGenerators.PropertyGenerator.class,
+//	    property = "id"
+//	)
 @Getter
 @Setter
 public class ProductCategory {
@@ -30,7 +37,8 @@ public class ProductCategory {
 	private String categoryName;
 	
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="category")
-	@JsonManagedReference
+//	@JsonManagedReference
+//	@JsonIgnoreProperties("category") 
 	private Set<Product> products;
 	
 	
