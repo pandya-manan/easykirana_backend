@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Registration</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .registration-card {
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-header {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px 10px 0 0;
+            padding: 1.5rem;
+        }
+        .form-body {
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0 0 10px 10px;
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+        }
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        .is-invalid {
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+		<!-- Error Message Alert -->
+		<div th:if="${errorMessage != null and errorMessage.contains('The seller already exists with this email id:')}" 
+		     class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+		    <i class="fas fa-exclamation-circle me-2"></i>
+		    <span th:text="${errorMessage}">Error message</span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+        <div class="registration-card">
+            <div class="form-header text-center">
+                <h2><i class="fas fa-store me-2"></i>Easy Kirana Seller Registration</h2>
+                <p class="mb-0">Please fill in your shop details</p>
+            </div>
+            
+            <div class="form-body">
+                <form th:action="@{/sellers/register}" th:object="${seller}" method="post">
+                    <!-- Shop Information Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Shop Information</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="shopName" class="form-label">Shop Name*</label>
+                                <input type="text" class="form-control" th:classappend="${#fields.hasErrors('shopName')} ? 'is-invalid'" 
+                                       id="shopName" th:field="*{shopName}" required placeholder="Enter shop name">
+                                <div class="error-message" th:if="${#fields.hasErrors('shopName')}" th:errors="*{shopName}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="shopOwner" class="form-label">Shop Owner Name*</label>
+                                <input type="text" class="form-control" th:classappend="${#fields.hasErrors('shopOwner')} ? 'is-invalid'" 
+                                       id="shopOwner" th:field="*{shopOwner}" required placeholder="Enter owner's name">
+                                <div class="error-message" th:if="${#fields.hasErrors('shopOwner')}" th:errors="*{shopOwner}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Information Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3 text-primary"><i class="fas fa-user-shield me-2"></i>Account Information</h5>
+                        
+                        <div class="mb-3">
+                            <label for="shopEmail" class="form-label">Shop Email*</label>
+                            <input type="email" class="form-control" th:classappend="${#fields.hasErrors('shopEmail')} ? 'is-invalid'" 
+                                   id="shopEmail" th:field="*{shopEmail}" required placeholder="Enter shop email">
+                            <div class="error-message" th:if="${#fields.hasErrors('shopEmail')}" th:errors="*{shopEmail}"></div>
+                        </div>
+                        
+                        <div class="mb-3 position-relative">
+                            <label for="password" class="form-label">Shop Password*</label>
+                            <input type="password" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" 
+                                   id="password" th:field="*{password}" required placeholder="Create a password">
+                            <span class="password-toggle" onclick="togglePasswordVisibility()">
+                                <i class="far fa-eye"></i>
+                            </span>
+                            <div class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            <div class="form-text">Password must be at least 8 characters</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="shopAdminName" class="form-label">Shop Admin Name*</label>
+                            <input type="text" class="form-control" th:classappend="${#fields.hasErrors('shopAdminName')} ? 'is-invalid'" 
+                                   id="shopAdminName" th:field="*{shopAdminName}" required placeholder="Enter admin's name">
+                            <div class="error-message" th:if="${#fields.hasErrors('shopAdminName')}" th:errors="*{shopAdminName}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Address Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3 text-primary"><i class="fas fa-map-marker-alt me-2"></i>Shop Address</h5>
+                        <div class="mb-3">
+                            <label for="shopAddress" class="form-label">Full Address*</label>
+                            <textarea class="form-control" th:classappend="${#fields.hasErrors('shopAddress')} ? 'is-invalid'" 
+                                      id="shopAddress" rows="3" th:field="*{shopAddress}" required placeholder="Enter full shop address"></textarea>
+                            <div class="error-message" th:if="${#fields.hasErrors('shopAddress')}" th:errors="*{shopAddress}"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms and Submit -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                        <label class="form-check-label" for="termsCheck">I agree to the terms and conditions</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>Register Seller
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Password Toggle Script -->
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.querySelector('.password-toggle i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Product - EasyKirana</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Your existing styles... */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .form-title {
+            color: #0e7490;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0e7490;
+            box-shadow: 0 0 0 0.25rem rgba(14, 116, 144, 0.25);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            background-color: #0e7490;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background-color: #0c5e73;
+        }
+
+        .form-check-input:checked {
+            background-color: #0e7490;
+            border-color: #0e7490;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 0.75rem;
+            background-color: #f9fafb;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: #0e7490;
+            background-color: #f0f9ff;
+        }
+
+        .file-upload-icon {
+            font-size: 1.5rem;
+            color: #0e7490;
+            margin-bottom: 0.5rem;
+        }
+
+        .existing-img {
+            max-height: 200px;
+            object-fit: contain;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2 class="form-title">
+        <i class="fas fa-edit me-2"></i>Edit Product
+    </h2>
+
+    <form th:action="@{'/sellers/edit/' + ${product.id}}" 
+          th:object="${product}" 
+          method="post" 
+          enctype="multipart/form-data">
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">SKU</label>
+                <input type="text" th:field="*{sku}" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Product Name</label>
+                <input type="text" th:field="*{name}" class="form-control" required>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea th:field="*{description}" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Unit Price (₹)</label>
+                <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" th:field="*{unitPrice}" class="form-control" step="0.01" min="0" required>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Units in Stock</label>
+                <input type="number" th:field="*{unitsInStock}" class="form-control" min="0" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <select th:field="*{category.id}" class="form-select" required>
+                    <option value="" disabled>Select Category</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.id}"
+                            th:text="${cat.categoryName}"
+                            th:selected="${cat.id == product.category.id}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-check form-switch pt-4">
+                    <input class="form-check-input" type="checkbox" th:field="*{active}" style="width: 3em; height: 1.5em;">
+                    <label class="form-check-label ms-2" for="active">Active Product</label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Product Image</label>
+
+                <div th:if="${product.imageUrl}">
+                    <img th:src="@{'/' + ${product.imageUrl}}" alt="Current Product Image" class="existing-img">
+                </div>
+
+                <div class="file-upload">
+                    <label for="imageFile" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                        <div>Click to upload new image</div>
+                        <small class="text-muted">Leave empty to keep existing image</small>
+                    </label>
+                    <input type="file" name="imageFile" class="file-upload-input" id="imageFile" accept="image/*">
+                </div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-save me-2"></i>Update Product
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('imageFile').addEventListener('change', function(e) {
+        const label = this.previousElementSibling;
+        if (this.files.length > 0) {
+            label.querySelector('div').textContent = this.files[0].name;
+        } else {
+            label.querySelector('div').textContent = 'Click to upload new image';
+        }
+    });
+</script>
+</body>
+</html>
