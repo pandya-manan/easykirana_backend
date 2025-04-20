@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Same head content as orders.html -->
+    <title>Order Details</title>
+    <!-- Include same CSS/JS as orders.html -->
+</head>
+<body>
+    <!-- Same navbar as orders.html -->
+    
+    <div class="container py-4">
+        <!-- Back button -->
+        <a th:href="@{/sellers/orders}" class="btn btn-outline-primary mb-4">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </a>
+        
+        <!-- Success/Error messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> 
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> 
+            <span th:text="${errorMessage}"></span>
+        </div>
+        
+        <!-- Order Details Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Order #<span th:text="${order.orderTrackingNumber}"></span></h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/sellers/orders/{orderId}/update-status(orderId=${order.orderId})}" method="post">
+                    <!-- Customer Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Customer Information</h5>
+                            <p class="mb-1"><strong>Name:</strong> <span th:text="${order.customerName}"></span></p>
+                            <p class="mb-1"><strong>Email:</strong> <span th:text="${order.customerEmail}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Shipping Address</h5>
+                            <p th:text="${order.shippingStreet}"></p>
+                            <p th:text="${order.shippingCity + ', ' + order.shippingState + ' - ' + order.shippingZip}"></p>
+                            <p th:text="${order.shippingCountry}"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary -->
+                    <div class="table-responsive mb-4">
+                        <table class="table">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- You'll need to update your DTO to include line items -->
+                                <tr th:each="item : ${order.items}">
+                                    <td th:text="${item.productName}"></td>
+                                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(item.unitPrice, 1, 2)}"></td>
+                                    <td class="text-end" th:text="${item.quantity}"></td>
+                                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(item.unitPrice * item.quantity, 1, 2)}"></td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <th colspan="3" class="text-end">Subtotal:</th>
+                                    <th class="text-end" th:text="'₹' + ${#numbers.formatDecimal(order.totalValueFromSeller, 1, 2)}"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <!-- Status Update Section -->
+                    <div class="border-top pt-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Order Status</strong></label>
+                                    <select name="newStatus" class="form-select">
+                                        <option th:each="status : ${statusOptions}"
+                                                th:value="${status}"
+                                                th:text="${status}"
+                                                th:selected="${status == order.orderStatus}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <div class="d-grid gap-2 d-md-block mt-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                    <a th:href="@{/sellers/orders}" class="btn btn-outline-secondary">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

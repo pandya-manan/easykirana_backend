@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Order Confirmation</title>
+    <style>
+        /* Your existing CSS remains exactly the same */
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4361ee;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4361ee;
+            margin-bottom: 5px;
+        }
+        .invoice-title {
+            font-size: 20px;
+            margin: 10px 0;
+            color: #333;
+        }
+        .order-info {
+            margin-bottom: 25px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+            color: #555;
+        }
+        .products-section {
+            margin: 20px 0;
+        }
+        .products-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4361ee;
+        }
+        .product-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .order-summary {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 2px solid #4361ee;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .total-row {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">EasyKirana</div>
+            <div class="invoice-title">ORDER CONFIRMATION</div>
+        </div>
+
+        <div class="order-info">
+            <div class="info-row">
+                <div class="info-label">Order Number:</div>
+                <div th:text="${order.orderId}">#12345</div>
+            </div>
+			
+			<div class="info-row">
+				<div class="info-label">Shop Name:</div>
+				<div th:text="${order.shopName}">Sample Kirana</div>
+			</div>
+			<div class="info-row">
+				<div class="info-label">Shop Owner:</div>
+				<div th:text="${order.shopOwnerName}">Sample Owner Name</div>
+			</div>
+			<div class="info-row">
+				<div class="info-label">Shop Address:</div>
+				<div th:text="${order.shopAddress}">Sample Shop Address</div>
+			</div>
+			
+			<div class="info-row">
+				<div class="info-label">Estimated Delivery Time:</div>
+				<div th:text="${order.estimatedDeliveryTime}">Estimated Delivery Time</div>
+			</div>
+			
+            <div class="info-row">
+                <div class="info-label">Date:</div>
+                <div th:text="${order.orderDate}">20 July 2023</div> <!-- Changed this line -->
+            </div>
+            <div class="info-row">
+                <div class="info-label">Customer:</div>
+                <div th:text="${order.customerName}">John Doe</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Email:</div>
+                <div th:text="${order.customerEmail}">john@example.com</div>
+            </div>
+        </div>
+
+        <div class="products-section">
+            <div class="products-title">Order Items (<span th:text="${order.totalItems}">3</span>)</div>
+            <div th:each="product : ${order.products}">
+                <div class="product-item" th:text="${product}">Product Name</div>
+            </div>
+        </div>
+
+        <div class="order-summary">
+            <div class="summary-row">
+                <span>Subtotal (<span th:text="${order.totalItems}">3</span> items):</span>
+                <span>₹<span th:text="${#numbers.formatDecimal(order.totalValue, 1, 2)}">0.00</span></span>
+            </div>
+            <div class="total-row">
+                <span>Total Amount:</span>
+                <span>₹<span th:text="${#numbers.formatDecimal(order.totalValue, 1, 2)}">0.00</span></span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for your order!</p>
+            <p>For any questions, please contact our customer support.</p>
+            <p>© <span th:text="${#dates.year(#dates.createNow())}">2025</span> EasyKirana. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

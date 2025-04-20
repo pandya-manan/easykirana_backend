@@ -3,6 +3,8 @@ package com.easykirana.ecommerce.service;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.lang.System.Logger;
 import java.util.*;
 
@@ -57,7 +59,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         // populate order with billingAddress and shippingAddress
         order.setBillingAddress(purchase.getBillingAddress());
         order.setShippingAddress(purchase.getShippingAddress());
-
+        order.setStatus("PENDING");
         // populate customer with order
         Customer customer = purchase.getCustomer();
         //check if this customer is an existing customer
@@ -80,21 +82,40 @@ public class CheckoutServiceImpl implements CheckoutService {
         List<Long> productIds = orderItems.stream()
                 .map(OrderItem::getProductId)
                 .toList(); 
-
-        //Fetch all product names in one query
-        List<String> productNames = productRepositoryBp.findProductNamesByIds(productIds);
-
+//
+//        //Fetch all product names in one query
+//        List<String> productNames = productRepositoryBp.findProductNamesByIds(productIds);
+//
+//        List<Item> emailItems = new ArrayList<>();
+//        int index = 0;
+//
+//        for (OrderItem item : orderItems) {
+//        	Item toAdd = new Item();
+//        	toAdd.setProductId(item.getProductId());
+//        	toAdd.setProductName(productNames.get(index++)); // Use pre-fetched product names
+//        	toAdd.setQuantity(item.getQuantity());
+//        	toAdd.setUnitPrice(item.getUnitPrice().doubleValue());
+//        	emailItems.add(toAdd);
+//        }
+        
         List<Item> emailItems = new ArrayList<>();
-        int index = 0;
 
-        for (OrderItem item : orderItems) {
-        	Item toAdd = new Item();
-        	toAdd.setProductId(item.getProductId());
-        	toAdd.setProductName(productNames.get(index++)); // Use pre-fetched product names
-        	toAdd.setQuantity(item.getQuantity());
-        	toAdd.setUnitPrice(item.getUnitPrice().doubleValue());
-        	emailItems.add(toAdd);
-        }
+     // Fetch all products in one query to maintain association between id, name and price
+     List<Product> products = productRepositoryBp.findByIdIn(productIds);
+
+     // Create a map of productId to Product for easy lookup
+     Map<Long, Product> productMap = products.stream()
+             .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+     for (OrderItem item : orderItems) {
+         Item toAdd = new Item();
+         Product product = productMap.get(item.getProductId());
+         toAdd.setProductId(item.getProductId());
+         toAdd.setProductName(product.getName()); // Get name from the product
+         toAdd.setQuantity(item.getQuantity());
+         toAdd.setUnitPrice(item.getUnitPrice().doubleValue()); // Use price from order item
+         emailItems.add(toAdd);
+     }
 
         toSendInfo.setItems(emailItems);
         LOGGER.info(toSendInfo.toString());

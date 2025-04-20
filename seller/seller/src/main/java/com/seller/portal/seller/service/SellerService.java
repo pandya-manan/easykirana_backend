@@ -30,5 +30,13 @@ public interface SellerService {
 	void deleteProduct(Long productId) throws IOException;
 	
 	Product getProductById(Long id);
+	
+	List<Country> countries();
 
+	public List<SellerOrderDashboardDTO> getDashboardData(Long sellerId);
+	
+	void saveOrderInvoiceEmail(OrderInvoiceDto orderInvoiceDto,Seller seller) throws SellerException;
+	
+	
+	
 }

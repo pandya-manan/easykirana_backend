@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Success</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="alert alert-success text-center" th:if="${successMessage}">
+            <h4 th:text="${successMessage}">Success message</h4>
+        </div>
+        
+        <div class="card text-center mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Registration Complete</h5>
+                <p class="card-text">Thank you for signing up with us on EasyKirana! You shall get your email with login details shortly.</p>
+                <a href="https://localhost:4200/products" class="btn btn-primary">Return to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

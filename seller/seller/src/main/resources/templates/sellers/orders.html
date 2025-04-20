@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EasyKirana - Seller Orders</title>
+    <meta name="seller-id" th:content="${sellerId}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reuse your existing styles from dashboard */
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-bg: #f8f9fa;
+            --dark-text: #2b2d42;
+            --light-text: #f8f9fa;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark-text);
+        }
+        
+        /* Navbar Styles (same as dashboard) */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+        }
+        
+        /* Orders Container */
+        .orders-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Orders Header */
+        .orders-header {
+            background-color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .orders-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+        
+        /* Order Cards Grid */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Order Card */
+        .order-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
+        }
+        
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .order-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .order-customer {
+            margin-bottom: 1rem;
+        }
+        
+        .customer-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .customer-email {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-details {
+            margin-bottom: 1rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+        }
+        
+        .products-list {
+            margin-top: 1rem;
+        }
+        
+        .products-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .action-btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .action-btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .action-btn-secondary:hover {
+            background-color: #f0f2f5;
+        }
+        
+        /* Back to Dashboard Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+        
+        .back-btn:hover {
+            color: var(--primary-dark);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .orders-container {
+                padding: 1rem;
+            }
+            
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .orders-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar (same as dashboard) -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/sellers/dashboard}">
+                <i class="fas fa-store"></i>EasyKirana
+            </a>
+            <div class="user-menu">
+                <span class="user-name" th:text="${session.loggedInSeller.shopName}"></span>
+                <a th:href="@{/sellers/logout}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Orders Content -->
+    <div class="orders-container">
+        <!-- Back Button -->
+        <a th:href="@{/sellers/dashboard}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        
+        <!-- Orders Header -->
+        <div class="orders-header">
+            <h1 class="orders-title">Your Orders</h1>
+            <div class="orders-count" id="ordersCount">Loading orders...</div>
+        </div>
+        
+        <!-- Orders Grid -->
+        <div class="orders-grid" id="ordersGrid">
+            <!-- Orders will be dynamically inserted here by JavaScript -->
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading your orders...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript to fetch and display orders -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get seller ID from meta tag
+            const sellerId = document.querySelector('meta[name="seller-id"]')?.content;
+            
+            if (!sellerId) {
+                showError("Seller information not found. Please login again.");
+                return;
+            }
+            
+            fetchOrders(sellerId);
+        });
+        
+        async function fetchOrders(sellerId) {
+            try {
+                showLoading();
+                
+                const response = await fetch(`/sellers/orders/${sellerId}`, {
+                    credentials: 'include' // Important for session cookies
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/sellers/login';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || 'Failed to fetch orders');
+                }
+                
+                const orders = await response.json();
+                displayOrders(orders);
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showError(error.message);
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('ordersGrid').innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading your orders...</p>
+                </div>
+            `;
+        }
+        
+        function showError(message) {
+            document.getElementById('ordersGrid').innerHTML = `
+                <div class="alert alert-danger">
+                    ${message}<br>
+                    <a href="/sellers/dashboard" class="btn btn-sm btn-primary mt-2">Return to Dashboard</a>
+                </div>
+            `;
+        }
+    
+        // Display orders in the grid
+        function displayOrders(orders) {
+            const ordersGrid = document.getElementById('ordersGrid');
+            const ordersCount = document.getElementById('ordersCount');
+            
+            if (orders.length === 0) {
+                ordersGrid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-clipboard-list fa-3x mb-3" style="color: #ccc;"></i>
+                        <h4>No orders found</h4>
+                        <p class="text-muted">You don't have any orders yet.</p>
+                    </div>
+                `;
+                ordersCount.textContent = '0 orders';
+                return;
+            }
+            
+            ordersCount.textContent = `${orders.length} ${orders.length === 1 ? 'order' : 'orders'}`;
+            
+            ordersGrid.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-id">Order #${order.orderTrackingNumber}</div>
+                        <div class="order-status ${getStatusClass(order.orderStatus)}">${order.orderStatus}</div>
+                    </div>
+                    
+                    <div class="order-customer">
+                        <div class="customer-name">${order.customerName}</div>
+                        <div class="customer-email">${order.customerEmail}</div>
+                    </div>
+                    
+                    <div class="order-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Order Date:</span>
+                            <span class="detail-value">${formatDate(order.orderDate)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Total Value:</span>
+                            <span class="detail-value">₹${order.totalValueFromSeller.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Items:</span>
+                            <span class="detail-value">${order.totalItemsFromSeller}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Est. Delivery:</span>
+                            <span class="detail-value">${order.estimatedDeliveryTime}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="products-list">
+                        <div class="products-title">Products:</div>
+                        ${order.productsOrdered.split(', ').map(product => `
+                            <div class="product-item">
+                                <span>${product}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="order-actions">
+                        <button class="action-btn action-btn-secondary invoice-btn" 
+                                data-order='${JSON.stringify(order)}'>
+                            <i class="fas fa-print"></i> Invoice
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add click event to all invoice buttons
+            document.querySelectorAll('.invoice-btn').forEach(button => {
+                button.addEventListener('click', handleInvoiceClick);
+            });
+        }
+        
+        
+		// Handle invoice button click
+		async function handleInvoiceClick(event) {
+		    const button = event.currentTarget;
+		    const orderData = JSON.parse(button.getAttribute('data-order'));
+		    
+		    try {
+		        button.disabled = true;
+		        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+		        
+		        // Create the data object to send
+		        const dataToSend = {
+		            orderId: orderData.orderTrackingNumber,
+		            customerName: orderData.customerName,
+		            customerEmail: orderData.customerEmail, // Added this field
+		            orderDate: orderData.orderDate,
+		            totalValue: orderData.totalValueFromSeller,
+		            totalItems: orderData.totalItemsFromSeller,
+					estimatedDeliveryTime: orderData.estimatedDeliveryTime,
+		            products: orderData.productsOrdered.split(', ')
+		        };
+		        
+		        // Simple POST request to send order data
+		        const response = await fetch('/sellers/log', {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json'
+		            },
+		            body: JSON.stringify(dataToSend)
+		        });
+		        
+		        if (!response.ok) throw new Error('Failed to send order data');
+		        
+		        // Just show a success message
+		        console.log('Order data sent:', dataToSend);
+		        alert(`Order #${orderData.orderTrackingNumber} data sent successfully!\nCustomer: ${orderData.customerName}\nEmail: ${orderData.customerEmail}\n Estimated Delivery Time: ${orderData.estimatedDeliveryTime}`);
+		        
+		    } catch (error) {
+		        console.error('Error:', error);
+		        alert('Error: ' + error.message);
+		    } finally {
+		        button.disabled = false;
+		        button.innerHTML = '<i class="fas fa-print"></i> Invoice';
+		    }
+		}
+        
+        // Helper function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+        
+        // Helper function to get status CSS class
+        function getStatusClass(status) {
+            const statusMap = {
+                'pending': 'status-pending',
+                'completed': 'status-completed',
+                'processing': 'status-processing',
+                'shipped': 'status-processing',
+                'cancelled': 'status-cancelled',
+                'delivered': 'status-completed'
+            };
+            return statusMap[status.toLowerCase()] || 'status-pending';
+        }
+    </script>
+</body>
+</html>

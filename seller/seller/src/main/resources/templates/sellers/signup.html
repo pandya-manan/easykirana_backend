@@ -13,7 +13,7 @@
             background-color: #f8f9fa;
         }
         .registration-card {
-            max-width: 600px;
+            max-width: 800px;
             margin: 2rem auto;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -48,17 +48,23 @@
         .is-invalid {
             border-color: #dc3545;
         }
+        .section-header {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-		<!-- Error Message Alert -->
-		<div th:if="${errorMessage != null and errorMessage.contains('The seller already exists with this email id:')}" 
-		     class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-		    <i class="fas fa-exclamation-circle me-2"></i>
-		    <span th:text="${errorMessage}">Error message</span>
-		    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-		</div>
+        <!-- Error Message Alert -->
+        <div th:if="${errorMessage != null and errorMessage.contains('The seller already exists with this email id:')}" 
+             class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
         <div class="registration-card">
             <div class="form-header text-center">
                 <h2><i class="fas fa-store me-2"></i>Easy Kirana Seller Registration</h2>
@@ -66,10 +72,10 @@
             </div>
             
             <div class="form-body">
-                <form th:action="@{/sellers/register}" th:object="${seller}" method="post">
+                <form th:action="@{/sellers/register}" th:object="${seller}" method="post" id="sellerForm">
                     <!-- Shop Information Section -->
                     <div class="mb-4">
-                        <h5 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Shop Information</h5>
+                        <h5 class="section-header text-primary"><i class="fas fa-info-circle me-2"></i>Shop Information</h5>
                         
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -89,7 +95,7 @@
                     
                     <!-- Account Information Section -->
                     <div class="mb-4">
-                        <h5 class="mb-3 text-primary"><i class="fas fa-user-shield me-2"></i>Account Information</h5>
+                        <h5 class="section-header text-primary"><i class="fas fa-user-shield me-2"></i>Account Information</h5>
                         
                         <div class="mb-3">
                             <label for="shopEmail" class="form-label">Shop Email*</label>
@@ -119,12 +125,54 @@
                     
                     <!-- Address Section -->
                     <div class="mb-4">
-                        <h5 class="mb-3 text-primary"><i class="fas fa-map-marker-alt me-2"></i>Shop Address</h5>
-                        <div class="mb-3">
-                            <label for="shopAddress" class="form-label">Full Address*</label>
-                            <textarea class="form-control" th:classappend="${#fields.hasErrors('shopAddress')} ? 'is-invalid'" 
-                                      id="shopAddress" rows="3" th:field="*{shopAddress}" required placeholder="Enter full shop address"></textarea>
-                            <div class="error-message" th:if="${#fields.hasErrors('shopAddress')}" th:errors="*{shopAddress}"></div>
+                        <h5 class="section-header text-primary"><i class="fas fa-map-marker-alt me-2"></i>Shop Address</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="street" class="form-label">Street Address*</label>
+                                <input type="text" class="form-control" th:classappend="${#fields.hasErrors('street')} ? 'is-invalid'" 
+                                       id="street" th:field="*{street}" required placeholder="Enter street address">
+                                <div class="error-message" th:if="${#fields.hasErrors('street')}" th:errors="*{street}"></div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">City*</label>
+                                <input type="text" class="form-control" th:classappend="${#fields.hasErrors('city')} ? 'is-invalid'" 
+                                       id="city" th:field="*{city}" required placeholder="Enter city">
+                                <div class="error-message" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="country" class="form-label">Country*</label>
+                                <select class="form-select" th:classappend="${#fields.hasErrors('country')} ? 'is-invalid'" 
+                                        id="country" name="country" required onchange="loadStates(this.value)">
+                                    <option value="">Select Country</option>
+                                    <option th:each="country : ${countries}" 
+                                            th:value="${country.name}" 
+                                            th:text="${country.name}"
+                                            th:selected="${seller?.country == country.name}"></option>
+                                </select>
+                                <div class="error-message" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="state" class="form-label">State/Province*</label>
+                                
+								<select class="form-select" th:field="*{state}" id="state" name="state" required>
+								    <option value="">Select State</option>
+								</select>
+
+                                <div class="error-message" th:if="${#fields.hasErrors('state')}" th:errors="*{state}"></div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="pinCode" class="form-label">PIN Code*</label>
+                                <input type="text" class="form-control" th:classappend="${#fields.hasErrors('pinCode')} ? 'is-invalid'" 
+                                       id="pinCode" th:field="*{pinCode}" required placeholder="Enter 2-6 digit PIN code"
+                                       pattern="[0-9]{2,6}" maxlength="6">
+                                <div class="error-message" th:if="${#fields.hasErrors('pinCode')}" th:errors="*{pinCode}"></div>
+                                <div class="form-text">Must be 2-6 digits only</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -147,7 +195,6 @@
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Password Toggle Script -->
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
@@ -163,6 +210,37 @@
                 icon.classList.add('fa-eye');
             }
         }
+        
+		function loadStates(country) {
+		    const stateSelect = document.getElementById("state");
+		    stateSelect.innerHTML = '<option>Loading...</option>';
+
+		    fetch(`https://localhost:8088/sellers/signup/states?countryName=${country}`)
+		        .then(response => response.json())
+		        .then(states => {
+		            stateSelect.innerHTML = '<option value="">Select State</option>';
+		            states.forEach(state => {
+		                const option = document.createElement("option");
+		                option.value = state.name;         // ✅ Set value to state name
+		                option.textContent = state.name;   // ✅ Show state name
+		                stateSelect.appendChild(option);
+		            });
+		        })
+		        .catch(error => {
+		            console.error('Error loading states:', error);
+		            stateSelect.innerHTML = '<option>Error loading states</option>';
+		        });
+		}
+
+
+        
+        // Initialize form with selected country's states if returning with errors
+        document.addEventListener('DOMContentLoaded', function() {
+            const countrySelect = document.getElementById('country');
+            if (countrySelect && countrySelect.value) {
+                loadStates(countrySelect.value);
+            }
+        });
     </script>
 </body>
 </html>

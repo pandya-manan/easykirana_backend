@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pending Customers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/admin-styles.css" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <!-- Inline Navbar (temporary solution) -->
+    <nav class="navbar navbar-expand-lg navbar-dark admin-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/admin/dashboard">
+                <i class="bi bi-shop"></i> Easy Kirana Admin
+            </a>
+            <div class="d-flex">
+                <a class="btn btn-outline-light" href="/admin/logout">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h2 class="mb-4">Pending Customers</h2>
+        
+        <div class="alert alert-info" th:if="${customers.empty}">
+            No pending customers found.
+        </div>
+        
+        <!-- Customer Cards -->
+        <div class="row g-4">
+            <div th:each="customer : ${customers.content}" class="col-md-6 col-lg-4">
+                <div class="card dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <span th:text="${customer.firstName + ' ' + customer.lastName}"></span>
+                            <span class="badge bg-warning ms-2">Pending</span>
+                        </h5>
+                        <div class="mb-3">
+                            <p class="mb-1"><i class="bi bi-person"></i> 
+                                <span th:text="${customer.userName}"></span>
+                            </p>
+                            <p class="mb-1"><i class="bi bi-envelope"></i> 
+                                <span th:text="${customer.primaryEmail}"></span>
+                            </p>
+                            <p class="mb-1"><i class="bi bi-key"></i> 
+                                <span th:text="${customer.password}"></span>
+                            </p>
+                        </div>
+						<button class="btn btn-admin-primary w-100" 
+						        th:data-id="${customer.customerId}"
+						        onclick="confirmCustomer(this)">
+						    <i class="bi bi-check-circle"></i> Confirm
+						</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${customers.totalPages > 1}" class="mt-4 text-center">
+            <a th:href="@{/admin/customers(page=${currentPage - 1}, size=${customers.size})}" 
+               th:if="${!customers.first}" class="btn btn-outline-primary me-2">
+                <i class="bi bi-chevron-left"></i> Previous
+            </a>
+            <span class="mx-2">
+                Page <span th:text="${currentPage + 1}"></span> of <span th:text="${customers.totalPages}"></span>
+            </span>
+            <a th:href="@{/admin/customers(page=${currentPage + 1}, size=${customers.size})}" 
+               th:if="${!customers.last}" class="btn btn-outline-primary ms-2">
+                Next <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+	function confirmCustomer(button) {
+	    const customerId = button.getAttribute('data-id');
+	    console.log("Confirming customer:", customerId);
+	    
+	    fetch(`/admin/confirm/${customerId}`, {
+	        method: 'POST'
+	    })
+	    .then(response => {
+	        if (response.ok) {
+	            alert("Confirmation sent for customer ID: " + customerId);
+	            // Optional: Remove the card from UI
+	            button.closest('.col-md-6').remove();
+	        }
+	    })
+	    .catch(error => console.error('Error:', error));
+	}
+	</script>
+</body>
+</html>

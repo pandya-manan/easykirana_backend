@@ -4,63 +4,191 @@
     <title>EasyKirana Seller Login</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-bg: #f8f9fa;
+            --dark-text: #2b2d42;
+            --light-text: #f8f9fa;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f3f4f6;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 100px;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--dark-text);
         }
+        
         .login-card {
             background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 3rem;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+        
         .form-title {
-            color: #0e7490;
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
             text-align: center;
+            position: relative;
+        }
+        
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .form-control {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
             margin-bottom: 1.5rem;
         }
-        .form-control {
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
+        
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
         }
+        
         .btn-login {
-            background-color: #0e7490;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.8rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             font-size: 1rem;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            margin-top: 1rem;
         }
+        
         .btn-login:hover {
-            background-color: #0c5e73;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-color));
         }
+        
         .signup-link {
             text-align: center;
-            margin-top: 1rem;
-            color: #6b7280;
+            margin-top: 2rem;
+            color: #666;
         }
+        
         .signup-link a {
-            color: #0e7490;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
+            transition: var(--transition);
         }
+        
         .signup-link a:hover {
+            color: var(--primary-dark);
             text-decoration: underline;
+        }
+        
+        .alert-danger {
+            background-color: rgba(247, 37, 133, 0.1);
+            border-left: 4px solid var(--warning-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Floating elements for visual interest */
+        .floating {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.1);
+            z-index: -1;
+        }
+        
+        .floating-1 {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            right: -50px;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .floating-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -30px;
+            left: -30px;
+            animation: float 10s ease-in-out infinite 2s;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .form-title {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Floating background elements -->
+    <div class="floating floating-1"></div>
+    <div class="floating floating-2"></div>
+
     <div class="login-card">
         <h2 class="form-title">
             <i class="fas fa-store me-2"></i>Seller Login

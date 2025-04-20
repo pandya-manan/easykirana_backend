@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Easy Kirana - Account Confirmed</title>
+    <style>
+        /* Main Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        
+        /* Header */
+        .header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 25px;
+            background: white;
+            border: 1px solid #dddddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        /* Credentials Box */
+        .credentials-box {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #388e3c;
+        }
+        
+        /* Detail Rows */
+        .detail-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            min-width: 120px;
+            color: #2e7d32;
+        }
+        
+        /* Button */
+        .login-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2e7d32;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .login-button:hover {
+            background-color: #388e3c;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 25px;
+            font-size: 0.9em;
+            color: #666666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Your Easy Kirana Account is Ready!</h2>
+    </div>
+    
+    <div class="content">
+        <p>Dear <strong th:text="${context.firstName + ' ' + context.lastName}"></strong>,</p>
+        
+        <p>Your account has been successfully confirmed. Here are your login details:</p>
+        
+        <div class="credentials-box">
+            <div class="detail-row">
+                <span class="detail-label">Username:</span>
+                <span th:text="${context.userName}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Email:</span>
+                <span th:text="${context.primaryEmail}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Password:</span>
+                <span th:text="${context.password}"></span>
+            </div>
+        </div>
+        
+        <p>You can now access your account using these credentials:</p>
+        
+        <div style="text-align: center;">
+            <a href="https://localhost:4200/products" class="login-button">
+                Go to Easy Kirana Portal
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>If you didn't request this account, please contact our support team.</p>
+            <p>© <span th:text="${#dates.year(#dates.createNow())}"></span> Easy Kirana. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

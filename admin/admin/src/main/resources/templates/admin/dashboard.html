@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/admin-styles.css" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-expand-lg navbar-dark admin-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shop"></i> Easy Kirana Admin
+            </a>
+            <div class="d-flex">
+                <a class="btn btn-outline-light" th:href="@{/admin/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h2 class="mb-4 text-center">Admin Dashboard</h2>
+        
+        <div class="row g-4">
+            <!-- Sellers Card -->
+            <div class="col-md-6">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-people-fill card-icon"></i>
+                        <h3 class="card-title">Manage Sellers</h3>
+                        <p class="card-text">View, approve, and manage all registered sellers</p>
+                        <a th:href="@{/admin/sellers}" class="btn btn-admin-primary">
+                            <i class="bi bi-arrow-right-circle"></i> Go to Sellers
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Customers Card -->
+            <div class="col-md-6">
+                <div class="card dashboard-card">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-person-lines-fill card-icon"></i>
+                        <h3 class="card-title">Manage Customers</h3>
+                        <p class="card-text">View and manage all customer accounts</p>
+                        <a th:href="@{/admin/customers}" class="btn btn-admin-primary">
+                            <i class="bi bi-arrow-right-circle"></i> Go to Customers
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

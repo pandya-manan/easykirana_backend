@@ -1,37 +1,67 @@
 package com.seller.portal.seller.controller;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.seller.portal.seller.entity.Country;
+import com.seller.portal.seller.entity.OrderInvoiceDto;
+import com.seller.portal.seller.entity.Product;
+import com.seller.portal.seller.entity.ProductCategory;
 import com.seller.portal.seller.entity.Seller;
+import com.seller.portal.seller.entity.SellerOrderDashboardDTO;
+import com.seller.portal.seller.entity.State;
 import com.seller.portal.seller.entity.User;
 import com.seller.portal.seller.exception.SellerException;
+import com.seller.portal.seller.repository.CountryRepository;
+import com.seller.portal.seller.repository.OrderRepository;
+import com.seller.portal.seller.repository.StateRepository;
+import com.seller.portal.seller.service.EmailServiceClient;
 import com.seller.portal.seller.service.SellerService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import com.seller.portal.seller.entity.*;
 
 @Controller
+
 @RequestMapping("/sellers")
 public class SellerController {
     
     @Autowired
     private SellerService sellerService;
+    
+    @Autowired
+    private StateRepository stateRepository;
+    
+    @Autowired
+    private CountryRepository countryRepository;
+    
+    @Autowired
+    private OrderRepository orderRepository;
+    
+    @Autowired
+    private EmailServiceClient emailServiceClient;
+    
+    private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
     
     @GetMapping("/home")
     public String returnHomePage(Model model) {
@@ -39,19 +69,49 @@ public class SellerController {
         return "sellers/home";
     }
     
+    @GetMapping("/getStatesByCountry/{countryId}")
+    @ResponseBody
+    public List<State> getStatesByCountry(@PathVariable int countryId) {
+        return stateRepository.findByCountryId(countryId);
+    }
+
+    
     @GetMapping("/signup")
     public String signUpToSellerPortal(Model model) {
         Seller newSeller = new Seller();
         model.addAttribute("seller", newSeller);
+        model.addAttribute("countries", sellerService.countries());
         return "sellers/signup";
     }
-    
+
+    @GetMapping("/signup/states")
+    @ResponseBody
+    public List<State> getStatesByCountry(@RequestParam String countryName) {
+        // First find the country by name
+        Country country = countryRepository.findByName(countryName);
+        if (country != null) {
+            return stateRepository.findByCountryId(country.getId());
+        }
+        return Collections.emptyList();
+    }
+
     @PostMapping("/register")
     public String registerSeller(@Valid Seller seller, 
                               BindingResult result, 
-                              RedirectAttributes redirectAttributes) throws SellerException {
+                              RedirectAttributes redirectAttributes,Model model) throws SellerException {
+        
         if (result.hasErrors()) {
-            // Return to signup with the same view path pattern
+            model.addAttribute("countries", countryRepository.findAll());
+            return "sellers/signup";
+        }
+        
+        // Additional validation for country/state
+        Country country = countryRepository.findByName(seller.getCountry());
+        State state = stateRepository.findByNameAndCountryId(seller.getState(), country.getId());
+        
+        if (state == null) {
+            result.rejectValue("state", "invalid.state", "Invalid state for selected country");
+            model.addAttribute("countries", countryRepository.findAll());
             return "sellers/signup";
         }
         
@@ -92,9 +152,21 @@ public class SellerController {
         return "redirect:/sellers/home";
     }
     
-    @GetMapping("/dashboard")  // Add this endpoint to handle the redirect
-    public String showDashboard() {
-        return "sellers/dashboard";  // No leading slash
+    @GetMapping("/dashboard")
+    public String showDashboard(HttpSession session, Model model) {
+        // Same session check as your products controller
+        Seller seller = (Seller) session.getAttribute("loggedInSeller");
+        if (seller == null) {
+            return "redirect:/sellers/login";
+        }
+        
+        // Optional success message handling (keep your existing functionality)
+        if (session.getAttribute("successMessage") != null) {
+            model.addAttribute("successMessage", session.getAttribute("successMessage"));
+            session.removeAttribute("successMessage");
+        }
+        
+        return "sellers/dashboard";
     }
     
     @GetMapping("/products")
@@ -127,7 +199,7 @@ public class SellerController {
                                    @RequestParam("imageFile") MultipartFile imageFile,
                                    HttpSession session,RedirectAttributes redirectAttributes) throws IOException {
         Seller seller = (Seller) session.getAttribute("loggedInSeller");
-        System.out.println("Seller information loggedin: "+seller.toString());
+        logger.info("Seller information logged in: {} {} {}",seller.getShopName(),seller.getShopOwner(),seller.getShopAdminName());
         sellerService.addProduct(product, imageFile, seller);
         redirectAttributes.addFlashAttribute("successMessage", "Product added successfully!");
         return "redirect:/sellers/products";
@@ -182,11 +254,54 @@ public class SellerController {
     }
 
 
+//    @GetMapping("/orders/{sellerId}")
+//    public List<SellerOrderDashboardDTO> getSellerOrders(@PathVariable Long sellerId) {
+//        return sellerService.getDashboardData(sellerId);
+//        
+//    }
+//
+    @GetMapping("/orders")
+    public String showOrdersPage(HttpSession session, Model model) {
+        // Verify seller is logged in
+        Seller loggedInSeller = (Seller) session.getAttribute("loggedInSeller");
+        if (loggedInSeller == null) {
+            return "redirect:/sellers/login";
+        }
+        
+        // Add seller ID to model (for JavaScript to access)
+        logger.info("Seller currently logged in: {} {} {} {} ",loggedInSeller.getId(),loggedInSeller.getShopName(),loggedInSeller.getShopOwner(),loggedInSeller.getShopAdminName());
+        model.addAttribute("sellerId", loggedInSeller.getId());
+        
+        return "sellers/orders";
+    }
 
-
-
-
-
-
-
+    @GetMapping("/orders/{sellerId}")
+    public ResponseEntity<?> getSellerOrders(@PathVariable Long sellerId, HttpSession session) {
+        // Verify seller is logged in
+        Seller loggedInSeller = (Seller) session.getAttribute("loggedInSeller");
+        if (loggedInSeller == null || !loggedInSeller.getId().equals(sellerId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        try {
+            List<SellerOrderDashboardDTO> orders = sellerService.getDashboardData(sellerId);
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error fetching orders");
+        }
+    } 
+    
+    @PostMapping("/log")
+    public ResponseEntity<String> logOrder(@RequestBody OrderInvoiceDto orderInvoiceDto,HttpSession session) throws SellerException {
+        // This will automatically map the JSON to your DTO
+        logger.info("Received Order Statistics: {}",orderInvoiceDto);
+        Seller loggedInSeller=(Seller)session.getAttribute("loggedInSeller");
+        logger.info("Logged In Seller at the time of log function: {}",loggedInSeller.getShopName());
+        sellerService.saveOrderInvoiceEmail(orderInvoiceDto,loggedInSeller);
+        logger.info("Called Service Method to send order invoice mail for: {}",orderInvoiceDto.getCustomerEmail());
+        // Process the data as needed
+        return ResponseEntity.ok("Order data received successfully");
+    }
+    
+    
 }

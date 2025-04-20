@@ -17,4 +17,6 @@ public interface ProductRepositoryBackUp extends JpaRepository<Product, Long> {
 	@Query("SELECT p.name FROM Product p WHERE p.id=?1")
 	String findProductNameById(Long productId);
 
+	List<Product> findByIdIn(List<Long> productIds);
+
 }
